@@ -1,64 +1,109 @@
-# T1 — ordenação com max-heap de capacidade fixa
+# T2 — max-heap na NUCLEO-F030R8
 
-Primeira versão para **host**, de acordo com a proposta de heap separada que a dupla descreveu e o professor aceitou excepcionalmente. O núcleo em C não usa recursão nem `malloc`; a leitura por `scanf` e a impressão ficam apenas na interface do host. O código é original e foi escrito a partir das operações descritas nas fontes ao fim do arquivo.
+Porta o T1 para o **STM32F030R8T6: Cortex-M0, 64 KiB de Flash, 8 KiB de RAM**. Preserva a max-heap auxiliar separada, a saída crescente e todo o intervalo de `int32_t`. A capacidade passa de **8.000 para 512 elementos por lote**. Os dois vetores originais exigem cerca de 64.000 bytes: não cabem na placa. Manter 8.000 valores exigiria armazenamento adicional ou outra mudança de requisito. Ordenar blocos isolados não produz uma ordenação global.
 
-## Resumo em cinco linhas para o documento da turma
+**Validação:** testes no PC e compilação ARM concluídos; execução e medições **na placa pendentes**. A suite serial está pronta. Compilação não comprova periféricos ou funcionamento físico.
 
-> O programa ordena um lote de inteiros usando uma max-heap binária de capacidade fixa.
-> Recebe um vetor com até 8.000 valores `int32_t` e armazena os valores em uma heap separada.
-> Remove repetidamente o maior valor e preenche o vetor de saída de trás para frente, em ordem crescente.
-> A construção por inserções e as remoções custam `O(n log n)` no pior caso; a heap auxiliar usa `O(n)` de memória.
-> Pode organizar lotes de amostras ou prioridades inteiras em sistemas embarcados que disponham da RAM necessária.
+## Executar no PC
 
-## Estrutura e interface
-
-| Arquivo | Responsabilidade |
-| --- | --- |
-| `include/heap.h`, `src/heap.c` | `Heap` com `dados[8000]` e `tamanho`; inicializar, inserir, remover máximo, consultar se está vazia. |
-| `include/heapsort.h`, `src/heapsort.c` | `heapsort_ordenar(vetor, quantidade)`: copia para a heap e escreve o resultado crescente no mesmo vetor. |
-| `src/main.c` | Lê a entrada textual e exibe o resultado, apenas no host. |
-
-A heap é uma árvore binária armazenada em vetor: o pai da posição `i > 0` fica em `(i-1)/2`; os filhos de `i` ficam em `2*i+1` e `2*i+2`. Em uma max-heap, cada pai é maior ou igual aos filhos. Inserir corrige o caminho da folha à raiz; remover o máximo corrige o caminho da raiz à folha. Esses caminhos têm altura `O(log n)`. Há um laço para as inserções, outro para as remoções e laços internos nas operações da heap.
-
-**Entrada:** primeiro um inteiro `n` entre 0 e 8000; depois `n` inteiros com sinal de 32 bits, separados por espaço ou linha. **Saída:** os mesmos `n` valores em ordem crescente, separados por espaços, com uma quebra de linha. O teste de exemplo usa `7` e `4 -2 7 4 0 -8 3`; a saída esperada é `-8 -2 0 3 4 4 7`. A função de ordenação recebe e devolve o vetor na mesma área; somente sua heap de trabalho é separada.
-
-## Executar e verificar
-
-Requer compilador C11, `make` e Python 3 para os testes. Na pasta do projeto:
+Requer C11, Make e Python 3. Na raiz:
 
 ```sh
-make
-./bin/heapsort < dados/exemplo.in
 make test
+printf '7 4 -2 7 4 0 -8 3\n' | build/t2_host
+# -8 -2 0 3 4 4 7
+make sanitize
 ```
 
-`make test` executa verificações da propriedade da max-heap após inserções e remoções, testa heap vazia e cheia, números extremos, duplicatas e o tamanho máximo.
-Depois compara 26 casos de entrada do programa, inclusive vetores de 8000 elementos em ordem crescente, decrescente, iguais e aleatórios com semente fixa, com `sorted()` do Python, usado como implementação de referência independente. 
-Também verifica entradas inválidas.
-O resultado esperado é o mesmo vetor ordenado, sem perda ou duplicação de valores, e todos os testes marcados `OK`.
-Nesta primeira versão, todos os testes passaram no host; os 26 casos também passaram com os verificadores de acesso à memória e comportamento indefinido habilitados (detecção de vazamentos desabilitada porque não funciona neste ambiente de execução).
+São **57 casos T2**: 41 lotes comparados integralmente com o T1 e com `sorted()`; 14 entradas inválidas, cada uma seguida de um lote válido no mesmo processo; CRLF/sinais e autoteste. Também executa os testes originais do T1, testes da propriedade da heap com capacidade 512 e testes C de timeout, wrap do relógio e recuperação de RX. `make sanitize` recompila e executa com ASan/UBSan no PC. O T1 continua com capacidade 8.000; seus caminhos de build foram corrigidos.
 
-Na demonstração, execute o exemplo manual, `make test` e mostre um trecho do caso de 8.000 elementos. Explique por que a raiz contém o maior valor, como cada remoção restaura a propriedade da heap e por que a escrita acontece do fim para o começo.
+## Compilar e gravar na placa
 
-## Memória e decisão para a placa
+Instale Arm GNU Toolchain e OpenOCD. Em Debian/Ubuntu: pacotes `gcc-arm-none-eabi`, `binutils-arm-none-eabi` e `openocd`.
 
-`int32_t` ocupa **4 bytes**: `dados[8000]` da heap ocupa 32.000 bytes; o vetor estático do `main` ocupa mais 32.000 bytes. No host de 64 bits, `sizeof(Heap)` costuma ser 32.008 bytes devido ao campo `size_t` (o teste imprime o valor real). As duas áreas de dados somam cerca de **64.000 bytes**, fora a pilha e a biblioteca C. Portanto, **8.000 inteiros de 32 bits não equivalem a 8 KB**; essa discrepância no enunciado deve ser discutida com o professor antes de adaptar para a placa.
+```sh
+make firmware
+# Compilador fora do PATH: make firmware ARM_PREFIX=/caminho/bin/arm-none-eabi-
+make test-limite
+make flash
+```
 
-A heap de trabalho e o vetor do host são `static`, então não são vetores grandes na pilha. Isso evita estouro de pilha, mas **não reduz a RAM total**. A variante clássica in-place poderia usar um único vetor e memória auxiliar `O(1)`; esta versão segue a proposta da dupla, com operações da heap separadas e memória auxiliar `O(n)`. A escolha não garante pontuação máxima no critério de dificuldade: é melhor demonstrar bem as operações, a análise e os testes do que reivindicar complexidade que o algoritmo não tem. Para embarcar, será necessário confirmar modelo da placa, RAM disponível e formato de entrada/saída; se a RAM não comportar 64 KB de dados, será preciso rever com o professor a representação ou a interface.
+São gerados `build/t2.elf`, `.bin`, `.hex`, `.map` e `.su`. O linker reserva 1.536 bytes para pilha, incluindo 64 de guarda, e recusa dados estáticos que invadam a reserva. `make test-limite` verifica isso em uma cópia temporária com capacidade experimental 1.024, que deve falhar na linkedição; não altera a entrega de 512. O MCU não usa `malloc`, libc, semihosting ou RTOS. É um projeto Make independente: **startup e tabela de vetores já estão incluídos; não acrescente outro startup/main do CubeIDE**.
 
-`src/heapsort.c` contém uma única heap estática: chamadas sequenciais funcionam, mas a função não é reentrante, o que importa se a placa usar interrupções ou tarefas concorrentes. O `main` depende de entrada/saída padrão do host; na placa, ele será substituído, mantendo o núcleo.
+Conecte o USB do ST-LINK com cabo de dados e mantenha os jumpers SWD. A porta virtual usa USART2 em PA2/PA3, AF1, conectada ao ST-LINK por SB13/SB14 na configuração padrão. Confira a revisão da placa antes de alterar pontes. O firmware usa HSI interno a **8 MHz**, independente do MCO/cristal da revisão.
 
-## Fontes e referência
+```sh
+python3 -m venv .venv
+# Linux/macOS: . .venv/bin/activate
+# Windows: .venv\Scripts\activate
+python3 -m pip install -r tests/requirements-serial.txt
+python3 tests/validar.py --porta /dev/ttyACM0 \
+  --referencia src/t1/bin/heapsort --json evidencias/placa.json
+# Windows: use COM3 ou a porta identificada no Gerenciador.
+```
 
-- [MIT OpenCourseWare — Lecture 4: Heaps and Heap Sort](https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/resources/lecture-4-heaps-and-heap-sort/): descrição da fila de prioridade, operações de heap e ordenação.
-- [MIT OpenCourseWare — Lecture 8: Binary Heaps (PDF)](https://ocw-preview.odl.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/40d4851e550507ca14dc778b9b2266cc_MIT6_006S20_lec8.pdf): construção por inserções, remoção do máximo e comparação com a versão in-place.
-- [Documentação oficial do Python — `heapq`](https://docs.python.org/3/library/heapq.html): propriedade de min-heap/max-heap e operações de inserção e remoção.
-- [Documentação oficial do Python — `sorted()`](https://docs.python.org/3/library/functions.html#sorted): função independente usada como resultado de referência nos testes.
+Feche outros terminais usando a porta. A suite UART repete os 57 casos e acrescenta o timeout físico de 5 s: **58 casos previstos na placa**. O relatório registra `meio=placa_uart`; só a execução com hardware pode concluir essa etapa. A referência T1 deve ser compilada no PC da demonstração.
 
-## Pontos para a apresentação
+## Protocolo
 
-1. **Funcionamento (20%)**: acompanhar à mão o exemplo e provar que o maior sempre sai da raiz.
-2. **Dificuldade (30%)**: defender os ajustes de heap na subida e descida, índices dos filhos, capacidade fixa e caso de erro; reconhecer que ordenação foi aceita excepcionalmente.
-3. **Testes (20%)**: mostrar os resultados da comparação com `sorted()`, a propriedade da heap durante a execução e os limites de 0 e 8.000 itens.
-4. **Reuso (10%)**: distinguir o núcleo `heap`/`heapsort` da leitura e saída do host e explicar o limite de uma chamada por vez.
-5. **Segurança na apresentação (20%)**: saber responder sobre `O(n log n)`, `O(n)` de memória auxiliar, diferença para o in-place e RAM real da placa.
+**115200 baud, 8N1, sem controle de fluxo.** Uma requisição por linha; aguarde a resposta completa antes de enviar outra. `n` e seus valores devem estar na mesma linha. Aceita espaços, tabs e CRLF; cada token tem no máximo 11 caracteres. No PC, EOF também finaliza um lote; na UART exige-se LF.
+
+| Enviar (terminado em LF) | Resposta |
+| --- | --- |
+| `7 4 -2 7 4 0 -8 3` | `-8 -2 0 3 4 4 7` |
+| `0` | Linha vazia |
+| `INFO` | Capacidade, tamanhos, contadores, guarda e tempo do último sort |
+| `TEST` | `TEST OK` se extremos e lote máximo passarem |
+| `513` ou `-1` | `ERR N` |
+| `1 2147483648` | `ERR VALOR` |
+| `3 1 2` ou `1 2 3` | `ERR QUANTIDADE` |
+
+Erros de sintaxe são respondidos no fim da linha. Após 5 s sem bytes em uma transação, retorna `ERR TIMEOUT`; ruído, overrun e estouro do buffer RX geram `ERR RX`. Nesses dois casos, envie LF para descartar a cauda antes da próxima transação. O protocolo não tem CRC: uma alteração que continue sendo um número válido pode escapar da detecção.
+
+LD2 alterna a cada 500 ms no main; uma transmissão longa pode atrasar a alternância. Aceso fixo indica falha fatal inspecionável por SWD. `sort_us` mede somente a ordenação, excluindo E/S, e depende da tolerância do HSI. No host, `ram_estatica=0` significa não medido nesse backend; `sizeof(Heap)` pode diferir do MCU por `size_t` e alinhamento.
+
+## Memória medida no ELF
+
+GCC Arm 12.2.1, `-Os`, Cortex-M0, sem libc:
+
+| Região | Bytes |
+| --- | ---: |
+| Heap: 512 inteiros e tamanho | 2.052 |
+| Vetor de entrada/saída | 2.048 |
+| RX, parser, diagnóstico e demais dados | 332 |
+| **RAM estática total** | **4.432** |
+| Reserva de pilha, incluindo guarda | 1.536 |
+| Margem não comprometida | 2.224 |
+| Flash utilizada | 2.932 |
+
+Fonte: [`evidencias/memoria.json`](evidencias/memoria.json). Outro compilador pode mudar os valores. Reserva de pilha não é medição do uso máximo; a guarda detecta algumas invasões e não prova ausência de overflow. O algoritmo continua `O(n log n)` em tempo e `O(n)` em memória auxiliar, sem recursão. A heap estática interna torna a ordenação não reentrante; somente o main a chama.
+
+## Arquivos e entrega
+
+| Caminho | Responsabilidade |
+| --- | --- |
+| `src/heapsort/`, `src/include/` | Núcleo original, agora com capacidade configurável |
+| `src/t1/` | Referência PC, com capacidade 8.000 |
+| `src/t2/app.c` | Parser incremental, validação, comandos e diagnóstico |
+| `src/t2/platform.c` | PC/MCU, startup, UART, interrupções, clock e GPIO |
+| `src/t2/stm32f030r8.ld` | Mapa de memória e proteção da reserva de pilha |
+| `tests/` | Testes unitários e suite comparativa PC/UART |
+| `entrega/t2.c` | **Único arquivo C comentado para entrega** |
+| `docs/apresentacao.pdf` | Slides de 8 minutos, com pendência física explícita |
+| `docs/roteiro.md` | Fala, divisão de tempo e perguntas individuais |
+| `docs/demonstracao.md` | Gravação, testes físicos e diagnóstico |
+
+Edite os módulos e execute `make entrega`; não edite a cópia gerada. Os dois builds compilam **o próprio `entrega/t2.c`**. O autoteste reutiliza o vetor e a heap existentes, sem uma terceira área grande.
+
+Use o PDF na entrega de slides e **apenas `entrega/t2.c` na entrega de código**. O pacote completo permite reproduzir o projeto. Após testar na placa, preencha as observações reais e gere novamente o PDF com `make slides` (dependência opcional em `tools/requirements-slides.txt`).
+
+Prazos do enunciado: demonstrações **19–23/10**, apresentações **26 e 30/10**, slides **30/10**, código **31/10**. O roteiro dá foco a migração, testes e aprendizado, incluindo a avaliação individual.
+
+## Referências
+
+- [ST — DS9773, STM32F030](https://www.st.com/resource/en/datasheet/stm32f030r8.pdf): memórias, características e funções alternativas.
+- [ST — UM1724, Nucleo-64 MB1136](https://www.st.com/resource/en/user_manual/dm00105823.pdf): placa, ST-LINK, USART e pontes.
+- [ST — RM0360](https://www.st.com/resource/en/reference_manual/dm00091010.pdf): registradores.
+- [ST — CMSIS STM32F030x8](https://github.com/STMicroelectronics/cmsis-device-f0/blob/master/Include/stm32f030x8.h) e [startup oficial](https://github.com/STMicroelectronics/cmsis-device-f0/blob/master/Source/Templates/gcc/startup_stm32f030x8.s): conferência de endereços, bits e vetores. O projeto escreve seu suporte mínimo próprio.
+- [MIT — Heaps and Heap Sort](https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/resources/lecture-4-heaps-and-heap-sort/): algoritmo do T1.
+- [Python — sorted()](https://docs.python.org/3/library/functions.html#sorted): referência independente.

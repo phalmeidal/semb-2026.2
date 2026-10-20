@@ -1,0 +1,105 @@
+mkdir -p build
+cc -std=c11 -O2 -Wall -Wextra -Wpedantic -Wconversion -Werror -DT2_HOST entrega/t2.c -o build/t2_host
+cc -std=c11 -O2 -Wall -Wextra -Wpedantic -Wconversion -Werror -DHEAP_CAPACIDADE=512u -Isrc/include \
+	src/t1/tests/teste_heap.c src/heapsort/heap.c src/heapsort/heapsort.c -o build/teste_heap
+cc -std=c11 -O2 -Wall -Wextra -Wpedantic -Wconversion -Werror -DHEAP_CAPACIDADE=512u -Isrc/include -Isrc/t2 \
+	tests/teste_protocolo.c src/t2/app.c src/heapsort/heap.c \
+	src/heapsort/heapsort.c -o build/teste_protocolo
+make -C src/t1 test
+make[1]: Entering directory '/workspace/semb-2026.2/src/t1'
+mkdir -p bin
+cc -I../include -std=c11 -O2 -Wall -Wextra -Wpedantic -Wconversion -Werror main.c ../heapsort/heap.c ../heapsort/heapsort.c -o bin/heapsort
+cc -I../include -std=c11 -O2 -Wall -Wextra -Wpedantic -Wconversion -Werror tests/teste_heap.c ../heapsort/heap.c ../heapsort/heapsort.c -o bin/teste_heap
+./bin/teste_heap
+Heap: capacidade 8000; sizeof(Heap) = 32008 bytes; testes OK
+python3 -m unittest discover -s tests -p '*_test.py' -v
+test_cases (heapsort_test.TestHeapsort.test_cases) ... ok
+test_casos_invalidos (heapsort_test.TestHeapsort.test_casos_invalidos) ... ok
+test_executable_exists (heapsort_test.TestHeapsort.test_executable_exists) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.057s
+
+OK
+make[1]: Leaving directory '/workspace/semb-2026.2/src/t1'
+./build/teste_heap
+Heap: capacidade 512; sizeof(Heap) = 2056 bytes; testes OK
+./build/teste_protocolo
+Protocolo: timeout, wrap uint32_t, erro RX e recuperacao OK
+python3 tests/validar.py --host build/t2_host --referencia src/t1/bin/heapsort --json evidencias/host.json
+OK host vazio
+OK host unitario
+OK host exemplo
+OK host extremos
+OK host crescente_512
+OK host decrescente_512
+OK host iguais_512
+OK host duplicados_512
+OK host extremos_512
+OK host aleatorio_09_n2
+OK host aleatorio_10_n3
+OK host aleatorio_11_n7
+OK host aleatorio_12_n31
+OK host aleatorio_13_n127
+OK host aleatorio_14_n255
+OK host aleatorio_15_n511
+OK host aleatorio_16_n512
+OK host aleatorio_17_n2
+OK host aleatorio_18_n3
+OK host aleatorio_19_n7
+OK host aleatorio_20_n31
+OK host aleatorio_21_n127
+OK host aleatorio_22_n255
+OK host aleatorio_23_n511
+OK host aleatorio_24_n512
+OK host aleatorio_25_n2
+OK host aleatorio_26_n3
+OK host aleatorio_27_n7
+OK host aleatorio_28_n31
+OK host aleatorio_29_n127
+OK host aleatorio_30_n255
+OK host aleatorio_31_n511
+OK host aleatorio_32_n512
+OK host aleatorio_33_n2
+OK host aleatorio_34_n3
+OK host aleatorio_35_n7
+OK host aleatorio_36_n31
+OK host aleatorio_37_n127
+OK host aleatorio_38_n255
+OK host aleatorio_39_n511
+OK host aleatorio_40_n512
+OK host capacidade_excedida + recuperacao
+OK host tamanho_negativo + recuperacao
+OK host tamanho_overflow + recuperacao
+OK host tamanho_texto + recuperacao
+OK host faltando + recuperacao
+OK host sobrando + recuperacao
+OK host zero_com_valor + recuperacao
+OK host positivo_fora_int32 + recuperacao
+OK host negativo_fora_int32 + recuperacao
+OK host token_longo + recuperacao
+OK host token_invalido + recuperacao
+OK host sinal_sem_numero + recuperacao
+OK host comando_com_argumento + recuperacao
+OK host byte_nulo + recuperacao
+57 casos OK (host); 41 comparacoes com sorted().
+/workspace/arm-toolchain/usr/bin/arm-none-eabi-gcc -std=c11 -Os -g3 -Wall -Wextra -Wpedantic -Wconversion -Werror -mcpu=cortex-m0 -mthumb -ffreestanding -fno-builtin -fno-common -ffunction-sections -fdata-sections -fstack-usage -fno-unwind-tables -fno-asynchronous-unwind-tables -nostdlib -Wl,--gc-sections -Wl,-Map,build/t2.map \
+	-T src/t2/stm32f030r8.ld entrega/t2.c -lgcc -o build/t2.elf
+/workspace/arm-toolchain/usr/bin/arm-none-eabi-objcopy -O binary build/t2.elf build/t2.bin
+/workspace/arm-toolchain/usr/bin/arm-none-eabi-objcopy -O ihex build/t2.elf build/t2.hex
+python3 tools/medir_memoria.py --prefix /workspace/arm-toolchain/usr/bin/arm-none-eabi- --elf build/t2.elf --json evidencias/memoria.json
+{
+  "elf": "build/t2.elf",
+  "flash_bytes": 2932,
+  "flash_limite": 65536,
+  "ram_estatica_bytes": 4432,
+  "pilha_reservada_bytes": 1536,
+  "ram_folga_bytes": 2224,
+  "ram_limite": 8192,
+  "vetores_reset_systick_usart2": "OK",
+  "simbolos_indefinidos": 0,
+  "validacao": "ELF compilado; nao e medicao de execucao na placa",
+  "fonte_sha256": "14ff703bfa02be1c6d5d8305646d58211b321a8920d9beaa957808f10bbed7ff",
+  "elf_sha256": "d25ff153d9e68d42e95814c646e45996b935531f866b68f1187f8a48712d4049",
+  "compilador": "arm-none-eabi-gcc (15:12.2.rel1-1) 12.2.1 20221205"
+}

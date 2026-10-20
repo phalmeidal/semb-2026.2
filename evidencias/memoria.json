@@ -1,0 +1,15 @@
+{
+  "elf": "build/t2.elf",
+  "flash_bytes": 2932,
+  "flash_limite": 65536,
+  "ram_estatica_bytes": 4432,
+  "pilha_reservada_bytes": 1536,
+  "ram_folga_bytes": 2224,
+  "ram_limite": 8192,
+  "vetores_reset_systick_usart2": "OK",
+  "simbolos_indefinidos": 0,
+  "validacao": "ELF compilado; nao e medicao de execucao na placa",
+  "fonte_sha256": "14ff703bfa02be1c6d5d8305646d58211b321a8920d9beaa957808f10bbed7ff",
+  "elf_sha256": "d25ff153d9e68d42e95814c646e45996b935531f866b68f1187f8a48712d4049",
+  "compilador": "arm-none-eabi-gcc (15:12.2.rel1-1) 12.2.1 20221205"
+}

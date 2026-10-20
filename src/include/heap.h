@@ -5,7 +5,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* O T1 usa 8000; o T2 seleciona 512 antes de incluir este cabecalho. */
+#ifndef HEAP_CAPACIDADE
 #define HEAP_CAPACIDADE 8000u
+#endif
 
 /* Max-heap binaria, com capacidade fixa e sem alocacao dinamica. */
 typedef struct {

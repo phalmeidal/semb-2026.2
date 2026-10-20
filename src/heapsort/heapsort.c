@@ -8,7 +8,8 @@ static Heap area_de_trabalho;
  * @param dados array de entrada
  * @param quantidade tamanho do array
  * @return Retorna `true` caso operação tenha sido concluída com éxito.
- * @note Esta operação altera o vetor de entrada, é uma operação "inplace".
+ * @note Altera o vetor de entrada, mas usa O(n) de memoria auxiliar;
+ *       nao e a variante classica in-place de memoria auxiliar O(1).
  *
  * Utiliza uma Heap estática para inserir os elementos e depois removê-los de
  * forma ordenada para o array

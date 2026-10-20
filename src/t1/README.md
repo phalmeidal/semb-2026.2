@@ -27,7 +27,7 @@ make test
 ```
 
 `make test` executa verificações da propriedade da max-heap após inserções e remoções, testa heap vazia e cheia, números extremos, duplicatas e o tamanho máximo.
-Depois compara 26 casos de entrada do programa, inclusive vetores de 8000 elementos em ordem crescente, decrescente, iguais e aleatórios com semente fixa, com `sorted()` do Python, usado como implementação de referência independente. 
+Depois compara 8 casos de entrada do programa, inclusive vetores de 8000 elementos em ordem crescente, decrescente, iguais e com duplicatas, com `sorted()` do Python, usado como implementação de referência independente.
 Também verifica entradas inválidas.
 O resultado esperado é o mesmo vetor ordenado, sem perda ou duplicação de valores, e todos os testes marcados `OK`.
 

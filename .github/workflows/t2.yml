@@ -1,0 +1,22 @@
+name: Validacao T2
+on: [push, pull_request]
+jobs:
+  host-e-arm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar toolchain ARM
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends gcc-arm-none-eabi binutils-arm-none-eabi
+      - name: Conferir entrega gerada
+        run: python3 tools/gerar_entrega.py && git diff --exit-code -- entrega/t2.c
+      - name: Validar com sanitizadores
+        run: make sanitize
+      - name: Compilar e validar firmware
+        run: make firmware test-limite
+      - uses: actions/upload-artifact@v4
+        with:
+          name: t2-firmware-e-evidencias
+          path: |
+            entrega/t2.c
+            build/t2.*
+            evidencias/*.json

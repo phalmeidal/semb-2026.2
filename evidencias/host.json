@@ -1,0 +1,336 @@
+{
+  "data_utc": "2026-10-20T21:24:00.405491+00:00",
+  "meio": "host",
+  "porta": null,
+  "capacidade": 512,
+  "casos": [
+    {
+      "nome": "vazio",
+      "n": 0,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "unitario",
+      "n": 1,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "exemplo",
+      "n": 7,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "extremos",
+      "n": 5,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "crescente_512",
+      "n": 512,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "decrescente_512",
+      "n": 512,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "iguais_512",
+      "n": 512,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "duplicados_512",
+      "n": 512,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "extremos_512",
+      "n": 512,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_09_n2",
+      "n": 2,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_10_n3",
+      "n": 3,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_11_n7",
+      "n": 7,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_12_n31",
+      "n": 31,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_13_n127",
+      "n": 127,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_14_n255",
+      "n": 255,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_15_n511",
+      "n": 511,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_16_n512",
+      "n": 512,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_17_n2",
+      "n": 2,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_18_n3",
+      "n": 3,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_19_n7",
+      "n": 7,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_20_n31",
+      "n": 31,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_21_n127",
+      "n": 127,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_22_n255",
+      "n": 255,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_23_n511",
+      "n": 511,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_24_n512",
+      "n": 512,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_25_n2",
+      "n": 2,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_26_n3",
+      "n": 3,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_27_n7",
+      "n": 7,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_28_n31",
+      "n": 31,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_29_n127",
+      "n": 127,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_30_n255",
+      "n": 255,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_31_n511",
+      "n": 511,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_32_n512",
+      "n": 512,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_33_n2",
+      "n": 2,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_34_n3",
+      "n": 3,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_35_n7",
+      "n": 7,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_36_n31",
+      "n": 31,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_37_n127",
+      "n": 127,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_38_n255",
+      "n": 255,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_39_n511",
+      "n": 511,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "aleatorio_40_n512",
+      "n": 512,
+      "ok": true,
+      "comparado_t1": true
+    },
+    {
+      "nome": "capacidade_excedida",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "tamanho_negativo",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "tamanho_overflow",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "tamanho_texto",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "faltando",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "sobrando",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "zero_com_valor",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "positivo_fora_int32",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "negativo_fora_int32",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "token_longo",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "token_invalido",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "sinal_sem_numero",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "comando_com_argumento",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "byte_nulo",
+      "ok": true,
+      "recuperou": true
+    },
+    {
+      "nome": "sinais_tabs_crlf",
+      "ok": true
+    },
+    {
+      "nome": "autoteste",
+      "ok": true
+    }
+  ],
+  "fonte_sha256": "14ff703bfa02be1c6d5d8305646d58211b321a8920d9beaa957808f10bbed7ff",
+  "info_inicial": "INFO cap=512 heap_bytes=2056 vetor_bytes=2048 ram_estatica=0 pilha_ok=1 ok=0 erros=0 rx_erros=0 sort_us=0",
+  "info_final": "INFO cap=512 heap_bytes=2056 vetor_bytes=2048 ram_estatica=0 pilha_ok=1 ok=56 erros=14 rx_erros=0 sort_us=0",
+  "status": "PASSOU"
+}

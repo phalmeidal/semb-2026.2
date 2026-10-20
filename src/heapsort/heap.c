@@ -64,7 +64,7 @@ bool heap_remover_maximo(Heap *heap, int32_t *maior)
     int32_t ultimo = heap->dados[restantes];
     size_t pai = 0;
 
-    /* O limite fixo (8000) tambem impede overflow em 2*pai+1. */
+    /* As capacidades do T1 (8000) e T2 (512) evitam overflow em 2*pai+1. */
     while (2u * pai + 1u < restantes) {
         size_t filho = 2u * pai + 1u;
         if (filho + 1u < restantes &&
