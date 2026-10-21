@@ -25,10 +25,10 @@ def gerar():
  */
 #define HEAP_CAPACIDADE 512u
 """
-    licenca = (RAIZ / "LICENSE").read_text()
+    licenca = (RAIZ / "LICENSE").read_text().rstrip()
     partes = [cabecalho, "\n/*\n" + "\n".join(" * " + linha for linha in licenca.splitlines()) + "\n */\n"]
     for fonte in FONTES:
-        conteudo = (RAIZ / fonte).read_text()
+        conteudo = (RAIZ / fonte).read_text().rstrip() + "\n"
         conteudo = re.sub(r'^#include "(?:heap|heapsort|t2)\.h"\s*$', '',
                           conteudo, flags=re.MULTILINE)
         partes.append(f"\n/* ===== {fonte} ===== */\n{conteudo}")

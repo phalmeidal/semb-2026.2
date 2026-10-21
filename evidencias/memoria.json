@@ -9,7 +9,7 @@
   "vetores_reset_systick_usart2": "OK",
   "simbolos_indefinidos": 0,
   "validacao": "ELF compilado; nao e medicao de execucao na placa",
-  "fonte_sha256": "3442c963fdfe2d54adba0ffa85114ecb91797a76ba2d3e353984811f8fc1095f",
-  "elf_sha256": "fab7a273acbee8dc9e8585f6c16ec4db0081400f758182d07480d6bc51f6abf7",
+  "fonte_sha256": "624c4771ba6dfc6917e14c489187abe939bfbec4c07cfb214aebbc2c676788af",
+  "elf_sha256": "5c93be4e6b4dd3880abbcce714a9d93f0d799e0edf1b558cab76a251e982d513",
   "compilador": "arm-none-eabi-gcc (15:13.2.rel1-2) 13.2.1 20231009"
 }

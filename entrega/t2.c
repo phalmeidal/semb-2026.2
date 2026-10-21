@@ -33,7 +33,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 
 /* ===== src/include/heap.h ===== */
@@ -63,7 +62,6 @@ bool heap_remover_maximo(Heap *heap, int32_t *maior); /* false se vazia */
 
 #endif
 
-
 /* ===== src/include/heapsort.h ===== */
 #ifndef HEAPSORT_H
 #define HEAPSORT_H
@@ -79,7 +77,6 @@ bool heap_remover_maximo(Heap *heap, int32_t *maior); /* false se vazia */
 bool heapsort_ordenar(int32_t dados[], size_t quantidade);
 
 #endif
-
 
 /* ===== src/t2/t2.h ===== */
 #ifndef T2_H
@@ -111,7 +108,6 @@ void t2_verificar_timeout(uint32_t agora_ms);
 void t2_erro_rx(void);
 
 #endif
-
 
 /* ===== src/heapsort/heap.c ===== */
 
@@ -197,7 +193,6 @@ bool heap_remover_maximo(Heap *heap, int32_t *maior)
     return true;
 }
 
-
 /* ===== src/heapsort/heapsort.c ===== */
 
 
@@ -238,7 +233,6 @@ bool heapsort_ordenar(int32_t dados[], size_t quantidade)
     }
     return true;
 }
-
 
 /* ===== src/t2/app.c ===== */
 /* Protocolo incremental: uma transacao por linha, sem guardar a linha inteira.
@@ -591,7 +585,6 @@ void t2_erro_rx(void)
     erro("RX"); /* Nunca ordenar silenciosamente uma mensagem corrompida. */
 }
 
-
 /* ===== src/t2/platform.c ===== */
 /* Duas plataformas para o MESMO aplicativo. O arquivo gerado entrega/t2.c
  * seleciona o host com -DT2_HOST. Sem essa macro, inclui startup e vetores
@@ -910,4 +903,3 @@ int main(void)
     }
 }
 #endif
-
