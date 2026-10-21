@@ -86,6 +86,7 @@ class Host:
         except subprocess.TimeoutExpired:
             self.processo.kill()
             self.processo.wait()
+        self.processo.stdout.close()
         if self.processo.returncode != 0:
             raise AssertionError(f"Host encerrou com {self.processo.returncode}")
 
@@ -106,7 +107,14 @@ class Placa:
         self.serial.reset_input_buffer()
 
     def enviar(self, mensagem):
-        self.serial.write(mensagem.encode("ascii"))
+        # Da tempo ao parser de 8 MHz; limita rajadas do driver USB/serial.
+        import time
+        dados = mensagem.encode("ascii")
+        for inicio in range(0, len(dados), 32):
+            parte = dados[inicio:inicio + 32]
+            if self.serial.write(parte) != len(parte):
+                raise OSError("Escrita UART incompleta")
+            time.sleep(0.004)
         self.serial.flush()
         linha = self.serial.readline()
         if not linha.endswith(b"\n"):
@@ -203,3 +211,4 @@ if __name__ == "__main__":
     except (AssertionError, OSError, subprocess.SubprocessError) as exc:
         print(f"FALHOU: {exc}", file=sys.stderr)
         sys.exit(1)
+

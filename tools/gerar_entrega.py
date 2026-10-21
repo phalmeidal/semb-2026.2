@@ -19,7 +19,8 @@ def gerar():
  * Este e o UNICO arquivo de codigo a submeter na entrega do T2.
  * Host: cc -std=c11 -O2 -DT2_HOST entrega/t2.c -o build/t2_host
  * MCU: make firmware (usa src/t2/stm32f030r8.ld, startup ja incluido aqui).
- * UART: 115200 8N1, uma linha por lote, limite 512 int32_t, comandos INFO/TEST.
+ * UART: 115200 8N1, uma linha por lote, 512 int32_t; INFO/TEST/MERGE (v2).
+ * 8000+ globais: tools/demo_placa.py usa PC como armazenamento de runs.
  * Nao juntar este startup a outro startup/main gerado pelo CubeIDE.
  */
 #define HEAP_CAPACIDADE 512u
@@ -38,3 +39,4 @@ def gerar():
 
 if __name__ == "__main__":
     gerar()
+

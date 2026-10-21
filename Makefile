@@ -34,6 +34,7 @@ test: host build/teste_heap build/teste_protocolo test-t1
 	./build/teste_heap
 	./build/teste_protocolo
 	$(PYTHON) tests/validar.py --host build/t2_host --referencia src/t1/bin/heapsort --json $(RELATORIO)
+	$(PYTHON) -m unittest discover -s tests -p 'test_demo.py' -v
 sanitize:
 	ASAN_OPTIONS=detect_leaks=0 $(MAKE) -B test RELATORIO=evidencias/sanitizers.json CFLAGS='-std=c11 -O1 -g $(WARN) -fsanitize=address,undefined -fno-omit-frame-pointer -fno-pie -no-pie'
 build/t2.elf: entrega/t2.c src/t2/stm32f030r8.ld | build
@@ -55,3 +56,4 @@ slides:
 clean:
 	rm -rf build
 	$(MAKE) -C src/t1 clean
+

@@ -1,6 +1,8 @@
 # T2 — max-heap na NUCLEO-F030R8
 
-Porta o T1 para o **STM32F030R8T6: Cortex-M0, 64 KiB de Flash, 8 KiB de RAM**. Preserva a max-heap auxiliar separada, a saída crescente e todo o intervalo de `int32_t`. A capacidade passa de **8.000 para 512 elementos por lote**. Os dois vetores originais exigem cerca de 64.000 bytes: não cabem na placa. Manter 8.000 valores exigiria armazenamento adicional ou outra mudança de requisito. Ordenar blocos isolados não produz uma ordenação global.
+Porta o T1 para o **STM32F030R8T6: Cortex-M0, 64 KiB de Flash, 8 KiB de RAM**. Preserva a max-heap auxiliar separada, a saída crescente e todo o intervalo de `int32_t`. A RAM comporta **512 elementos por lote**. Para ordenar **8.000 ou mais globalmente**, `tools/demo_placa.py` usa o PC como armazenamento externo: o MCU ordena os blocos com max-heap e intercala janelas de até 256 + 256 inteiros. O PC apenas transporta e guarda os runs; `sorted()` é usado exclusivamente como referência depois do resultado final. Isso exige PC conectado durante a demonstração; não é uma ordenação autônoma de 8.000 valores em RAM interna.
+
+**Comece por [docs/demonstracao-8000.md](docs/demonstracao-8000.md)** para gravar e executar. Este fork usa protocolo **textual a 115200 baud**, incompatível com `ClientUART` binário a 38400 do repositório original. Grave o firmware deste fork e use o cliente correspondente. O erro `len(None)` da foto é consequência de tentar interpretar uma resposta ausente; este cliente interrompe com diagnóstico de timeout/protocolo.
 
 **Validação:** testes no PC e compilação ARM concluídos; execução e medições **na placa pendentes**. A suite serial está pronta. Compilação não comprova periféricos ou funcionamento físico.
 
@@ -15,7 +17,7 @@ printf '7 4 -2 7 4 0 -8 3\n' | build/t2_host
 make sanitize
 ```
 
-São **57 casos T2**: 41 lotes comparados integralmente com o T1 e com `sorted()`; 14 entradas inválidas, cada uma seguida de um lote válido no mesmo processo; CRLF/sinais e autoteste. Também executa os testes originais do T1, testes da propriedade da heap com capacidade 512 e testes C de timeout, wrap do relógio e recuperação de RX. `make sanitize` recompila e executa com ASan/UBSan no PC. O T1 continua com capacidade 8.000; seus caminhos de build foram corrigidos.
+São **57 casos T2**: 41 lotes comparados integralmente com o T1 e com `sorted()`; 14 entradas inválidas, cada uma seguida de um lote válido no mesmo processo; CRLF/sinais e autoteste. A extensão v2 acrescenta oito cenários de ordenação global (incluindo 8.000, 8.001 e 16.000 elementos) e nove casos inválidos de MERGE com recuperação. Também executa os testes originais do T1, testes da propriedade da heap com capacidade 512 e testes C de timeout, wrap do relógio e recuperação de RX. `make sanitize` recompila e executa com ASan/UBSan no PC. O T1 continua com capacidade 8.000; seus caminhos de build foram corrigidos.
 
 ## Compilar e gravar na placa
 
@@ -52,7 +54,8 @@ Feche outros terminais usando a porta. A suite UART repete os 57 casos e acresce
 | --- | --- |
 | `7 4 -2 7 4 0 -8 3` | `-8 -2 0 3 4 4 7` |
 | `0` | Linha vazia |
-| `INFO` | Capacidade, tamanhos, contadores, guarda e tempo do último sort |
+| `INFO` | Capacidade, versão do protocolo (`versao=2`), tamanhos, contadores, guarda e tempo do último sort |
+| `MERGE a b ...` | `MERGE consumidos_a consumidos_b prefixo...`; duas janelas crescentes, 1–256 valores cada |
 | `TEST` | `TEST OK` se extremos e lote máximo passarem |
 | `513` ou `-1` | `ERR N` |
 | `1 2147483648` | `ERR VALOR` |
@@ -64,17 +67,17 @@ LD2 alterna a cada 500 ms no main; uma transmissão longa pode atrasar a altern�
 
 ## Memória medida no ELF
 
-GCC Arm 12.2.1, `-Os`, Cortex-M0, sem libc:
+GCC Arm 13.2.1, `-Os`, Cortex-M0, sem libc (protocolo v2):
 
 | Região | Bytes |
 | --- | ---: |
 | Heap: 512 inteiros e tamanho | 2.052 |
 | Vetor de entrada/saída | 2.048 |
-| RX, parser, diagnóstico e demais dados | 332 |
-| **RAM estática total** | **4.432** |
+| RX, parser, diagnóstico e demais dados | 340 |
+| **RAM estática total** | **4.440** |
 | Reserva de pilha, incluindo guarda | 1.536 |
-| Margem não comprometida | 2.224 |
-| Flash utilizada | 2.932 |
+| Margem não comprometida | 2.216 |
+| Flash utilizada | 3.256 |
 
 Fonte: [`evidencias/memoria.json`](evidencias/memoria.json). Outro compilador pode mudar os valores. Reserva de pilha não é medição do uso máximo; a guarda detecta algumas invasões e não prova ausência de overflow. O algoritmo continua `O(n log n)` em tempo e `O(n)` em memória auxiliar, sem recursão. A heap estática interna torna a ordenação não reentrante; somente o main a chama.
 
@@ -93,7 +96,7 @@ Fonte: [`evidencias/memoria.json`](evidencias/memoria.json). Outro compilador po
 | `docs/roteiro.md` | Fala, divisão de tempo e perguntas individuais |
 | `docs/demonstracao.md` | Gravação, testes físicos e diagnóstico |
 
-Edite os módulos e execute `make entrega`; não edite a cópia gerada. Os dois builds compilam **o próprio `entrega/t2.c`**. O autoteste reutiliza o vetor e a heap existentes, sem uma terceira área grande.
+Edite os módulos e execute `make entrega`; não edite a cópia gerada. Os dois builds compilam **o próprio `entrega/t2.c`**. O autoteste reutiliza o vetor e a heap existentes, sem uma terceira área grande. A demonstração global também exige o cliente Python; o arquivo C sozinho processa apenas as janelas. Os slides existentes descrevem a versão de lotes e precisam refletir esta extensão antes da apresentação.
 
 Use o PDF na entrega de slides e **apenas `entrega/t2.c` na entrega de código**. O pacote completo permite reproduzir o projeto. Após testar na placa, preencha as observações reais e gere novamente o PDF com `make slides` (dependência opcional em `tools/requirements-slides.txt`).
 
@@ -107,3 +110,4 @@ Prazos do enunciado: demonstrações **19–23/10**, apresentações **26 e 30/1
 - [ST — CMSIS STM32F030x8](https://github.com/STMicroelectronics/cmsis-device-f0/blob/master/Include/stm32f030x8.h) e [startup oficial](https://github.com/STMicroelectronics/cmsis-device-f0/blob/master/Source/Templates/gcc/startup_stm32f030x8.s): conferência de endereços, bits e vetores. O projeto escreve seu suporte mínimo próprio.
 - [MIT — Heaps and Heap Sort](https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/resources/lecture-4-heaps-and-heap-sort/): algoritmo do T1.
 - [Python — sorted()](https://docs.python.org/3/library/functions.html#sorted): referência independente.
+

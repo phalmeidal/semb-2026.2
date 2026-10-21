@@ -1,0 +1,15 @@
+{
+  "data_utc": "2026-10-21T20:17:09.874083+00:00",
+  "meio": "host",
+  "porta": null,
+  "n": 8000,
+  "seed": 20262,
+  "status": "PASSOU",
+  "armazenamento": "RAM do PC",
+  "ordenacao_e_intercalacao": "MCU ou backend host explicitado",
+  "info_inicial": "INFO cap=512 versao=2 heap_bytes=2056 vetor_bytes=2048 ram_estatica=0 pilha_ok=1 ok=0 erros=0 rx_erros=0 sort_us=0",
+  "transacoes": 93,
+  "segundos": 0.041317419999984395,
+  "resultado_sha256": "b15ccb907975373d64c472535313a36bcf3f7593ca218905ccf21e45d15f4748",
+  "info_final": "INFO cap=512 versao=2 heap_bytes=2056 vetor_bytes=2048 ram_estatica=0 pilha_ok=1 ok=16 erros=0 rx_erros=0 sort_us=21"
+}

@@ -1,5 +1,5 @@
 {
-  "data_utc": "2026-10-20T21:24:00.405491+00:00",
+  "data_utc": "2026-10-21T20:17:09.055292+00:00",
   "meio": "host",
   "porta": null,
   "capacidade": 512,
@@ -329,8 +329,8 @@
       "ok": true
     }
   ],
-  "fonte_sha256": "14ff703bfa02be1c6d5d8305646d58211b321a8920d9beaa957808f10bbed7ff",
-  "info_inicial": "INFO cap=512 heap_bytes=2056 vetor_bytes=2048 ram_estatica=0 pilha_ok=1 ok=0 erros=0 rx_erros=0 sort_us=0",
-  "info_final": "INFO cap=512 heap_bytes=2056 vetor_bytes=2048 ram_estatica=0 pilha_ok=1 ok=56 erros=14 rx_erros=0 sort_us=0",
+  "fonte_sha256": "3442c963fdfe2d54adba0ffa85114ecb91797a76ba2d3e353984811f8fc1095f",
+  "info_inicial": "INFO cap=512 versao=2 heap_bytes=2056 vetor_bytes=2048 ram_estatica=0 pilha_ok=1 ok=0 erros=0 rx_erros=0 sort_us=0",
+  "info_final": "INFO cap=512 versao=2 heap_bytes=2056 vetor_bytes=2048 ram_estatica=0 pilha_ok=1 ok=56 erros=14 rx_erros=0 sort_us=1",
   "status": "PASSOU"
 }

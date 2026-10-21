@@ -14,6 +14,8 @@ static struct {
     size_t usados;
     size_t esperados;
     size_t recebidos;
+    size_t esquerda;
+    unsigned fase_merge;
     uint32_t ultimo_ms;
     const char *erro;
     char comando;
@@ -95,6 +97,8 @@ static void reiniciar(void)
     entrada.usados = 0;
     entrada.esperados = 0;
     entrada.recebidos = 0;
+    entrada.esquerda = 0;
+    entrada.fase_merge = 0;
     entrada.erro = NULL;
     entrada.comando = '\0';
     entrada.tem_n = false;
@@ -122,6 +126,7 @@ static void info(void)
 {
     texto("INFO");
     campo("cap", HEAP_CAPACIDADE);
+    campo("versao", 2u);
     campo("heap_bytes", (uint32_t)sizeof(Heap));
     campo("vetor_bytes", (uint32_t)sizeof(vetor));
     campo("ram_estatica", plataforma_ram_estatica());
@@ -175,7 +180,24 @@ static void token_pronto(void)
     }
     entrada.token[entrada.usados] = '\0';
     entrada.usados = 0;
+    if (entrada.comando == 'M' && entrada.fase_merge < 2u) {
+        int32_t n;
+        if (!converter(entrada.token, &n) || n <= 0 ||
+            (uint32_t)n > HEAP_CAPACIDADE / 2u) {
+            entrada.erro = "N";
+        } else if (entrada.fase_merge++ == 0u) {
+            entrada.esquerda = (size_t)n;
+        } else {
+            entrada.esperados = entrada.esquerda + (size_t)n;
+            entrada.tem_n = true;
+        }
+        return;
+    }
     if (!entrada.tem_n && entrada.comando == '\0') {
+        if (igual(entrada.token, "MERGE")) {
+            entrada.comando = 'M';
+            return;
+        }
         if (igual(entrada.token, "INFO") || igual(entrada.token, "TEST")) {
             entrada.comando = entrada.token[0];
             return;
@@ -190,7 +212,7 @@ static void token_pronto(void)
         entrada.tem_n = true;
         return;
     }
-    if (entrada.comando != '\0') {
+    if (entrada.comando != '\0' && entrada.comando != 'M') {
         entrada.erro = "COMANDO";
     } else if (entrada.recebidos >= entrada.esperados) {
         entrada.erro = "QUANTIDADE";
@@ -204,11 +226,49 @@ static void token_pronto(void)
     }
 }
 
+/* Intercala duas janelas ordenadas. Para assim que uma janela se esgota:
+ * somente esse prefixo e seguro sem conhecer a proxima janela do PC.
+ * Reutiliza vetor; nao aloca outro buffer nem usa comparacoes no cliente.
+ */
+static void intercalar(void)
+{
+    size_t corte = entrada.esquerda;
+    size_t fim = entrada.esperados;
+    for (size_t k = 1; k < fim; ++k) {
+        if (k != corte && vetor[k] < vetor[k - 1u]) {
+            erro("ORDEM");
+            return;
+        }
+    }
+    size_t i = 0, j = corte;
+    while (i < corte && j < fim) {
+        if (vetor[i] <= vetor[j]) { ++i; } else { ++j; }
+    }
+    texto("MERGE ");
+    natural((uint32_t)i);
+    plataforma_enviar(' ');
+    natural((uint32_t)(j - corte));
+    i = 0;
+    j = corte;
+    while (i < corte && j < fim) {
+        plataforma_enviar(' ');
+        if (vetor[i] <= vetor[j]) { inteiro(vetor[i++]); }
+        else { inteiro(vetor[j++]); }
+    }
+    plataforma_enviar('\n');
+}
+
 static void finalizar(void)
 {
     token_pronto();
     if (entrada.erro != NULL) {
         erro(entrada.erro);
+    } else if (entrada.comando == 'M') {
+        if (!entrada.tem_n || entrada.recebidos != entrada.esperados) {
+            erro("QUANTIDADE");
+        } else {
+            intercalar();
+        }
     } else if (entrada.comando == 'I') {
         info();
     } else if (entrada.comando == 'T') {
@@ -288,3 +348,4 @@ void t2_erro_rx(void)
     entrada.descartar = true;
     erro("RX"); /* Nunca ordenar silenciosamente uma mensagem corrompida. */
 }
+
